@@ -7,17 +7,11 @@ from plant.infrastructure.repositories import SQLAlchemyPlantRepository
 from shared.database import get_db_session
 
 # --- Simulación del contexto IAM ---
-# En un sistema real, harías una llamada a tu servicio IAM.
-# Por ahora, simularemos que obtenemos los datos del dispositivo.
 def get_device_info(device_id: str) -> dict:
-    """
-    Simula la obtención de información de un dispositivo desde el contexto IAM.
-    """
     if device_id == "wokwi-esp32-1":
         return {"id": device_id, "name": "Wokwi Lab Station 1", "location": "Development Lab"}
     return None
 # ------------------------------------
-
 
 plant_blueprint = Blueprint("plant", __name__)
 
@@ -49,6 +43,47 @@ def add_plant_data():
         description: Dispositivo no autorizado.
       502:
         description: Datos guardados localmente, pero falló el reenvío al backend central.
+    definitions:
+      PlantData:
+        type: object
+        required:
+          - temperature
+          - humidity
+          - light
+          - soil_humidity
+        properties:
+          temperature:
+            type: number
+            description: La temperatura registrada.
+            example: 25.5
+          humidity:
+            type: number
+            description: La humedad ambiental registrada.
+            example: 60.2
+          light:
+            type: integer
+            description: El nivel de luz registrado.
+            example: 850
+          soil_humidity:
+            type: integer
+            description: La humedad del suelo registrada.
+            example: 75
+      Plant:
+        type: object
+        properties:
+          id:
+            type: integer
+          temperature:
+            type: number
+          humidity:
+            type: number
+          light:
+            type: integer
+          soil_humidity:
+            type: integer
+          created_at:
+            type: string
+            format: date-time
     """
     # 1. Identificar el dispositivo (Contexto IAM)
     device_id = request.headers.get("X-Device-Id")
@@ -78,8 +113,6 @@ def add_plant_data():
     success, response_data = forwarding_service.forward_data(saved_plant_data, device_info)
 
     if not success:
-        # Si falla el reenvío, se devuelve un error 502 (Bad Gateway).
-        # Los datos ya están guardados localmente, lo cual es bueno.
         return jsonify({
             "message": "Datos guardados localmente, pero falló el reenvío al backend central.",
             "local_data": saved_plant_data,
