@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flasgger import swag_from
 from plant.application.services import PlantApplicationService
-from plant.application.forwarding_service import ForwardingService
+# from plant.application.forwarding_service import ForwardingService  # Comentado temporalmente
 from plant.domain.services import PlantService
 from plant.infrastructure.repositories import SQLAlchemyPlantRepository
 from shared.database import get_db_session
@@ -13,12 +13,13 @@ def get_device_info(device_id: str) -> dict:
     return None
 # ------------------------------------
 
+
 plant_blueprint = Blueprint("plant", __name__)
 
 @plant_blueprint.route("/plants", methods=["POST"])
 def add_plant_data():
     """
-    Endpoint para añadir nuevos datos de una planta y reenviarlos al backend central.
+    Endpoint para añadir nuevos datos de una planta. (Reenvío a backend deshabilitado temporalmente)
     ---
     tags:
       - Plants
@@ -36,13 +37,11 @@ def add_plant_data():
           $ref: "#/definitions/PlantData"
     responses:
       200:
-        description: Datos guardados localmente y reenviados exitosamente.
+        description: Datos guardados localmente exitosamente.
       400:
         description: Error en la petición (JSON inválido o falta de cabecera).
       401:
         description: Dispositivo no autorizado.
-      502:
-        description: Datos guardados localmente, pero falló el reenvío al backend central.
     definitions:
       PlantData:
         type: object
@@ -108,19 +107,20 @@ def add_plant_data():
         
     saved_plant_data = plant_application_service.add_plant_data(data)
 
-    # 3. Reenviar los datos al backend de Spring Boot
-    forwarding_service = ForwardingService()
-    success, response_data = forwarding_service.forward_data(saved_plant_data, device_info)
+    # 3. Reenviar los datos al backend de Spring Boot (SECCIÓN COMENTADA)
+    # forwarding_service = ForwardingService()
+    # success, response_data = forwarding_service.forward_data(saved_plant_data, device_info)
+    #
+    # if not success:
+    #     return jsonify({
+    #         "message": "Datos guardados localmente, pero falló el reenvío al backend central.",
+    #         "local_data": saved_plant_data,
+    #         "forwarding_error": response_data
+    #     }), 502
 
-    if not success:
-        return jsonify({
-            "message": "Datos guardados localmente, pero falló el reenvío al backend central.",
-            "local_data": saved_plant_data,
-            "forwarding_error": response_data
-        }), 502
-
+    # Se devuelve una respuesta de éxito simple.
     return jsonify({
-        "message": "Datos guardados y reenviados exitosamente.",
-        "local_data": saved_plant_data,
-        "backend_response": response_data
+        "message": "Datos guardados localmente exitosamente.",
+        "device_info": device_info,
+        "saved_data": saved_plant_data
     }), 200
