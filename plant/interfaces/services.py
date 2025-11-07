@@ -16,6 +16,35 @@ def get_device_info(device_id: str) -> dict:
 
 plant_blueprint = Blueprint("plant", __name__)
 
+
+@plant_blueprint.route("/plants", methods=["GET"])
+def get_all_plants():
+    """
+    Obtiene todos los registros de datos de plantas.
+    Devuelve una lista de todos los datos de sensores guardados en la base de datos,
+    ordenados por fecha de creación descendente.
+    ---
+    tags:
+      - Plants
+    responses:
+      200:
+        description: Una lista de todos los registros de datos de plantas.
+        schema:
+          type: array
+          items:
+            $ref: '#/definitions/Plant'
+    """
+    db_session = next(get_db_session())
+    plant_repository = SQLAlchemyPlantRepository(db_session=db_session)
+    plant_service = PlantService()
+    plant_application_service = PlantApplicationService(
+        plant_service=plant_service, plant_repository=plant_repository
+    )
+
+    all_data = plant_application_service.get_all_plant_data()
+    return jsonify(all_data)
+
+
 @plant_blueprint.route("/plants", methods=["POST"])
 def add_plant_data():
     """

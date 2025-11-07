@@ -7,13 +7,13 @@ from plant.infrastructure.models import Base
 # Crear tablas de la base de datos
 Base.metadata.create_all(bind=engine)
 
-# Inicializar la aplicación Flask
+
 app = Flask(__name__)
 
 # Configurar e inicializar Swagger
 swagger = Swagger(app)
 
-# Registrar el Blueprint de las plantas
+
 app.register_blueprint(plant_blueprint)
 
 @app.route("/")
