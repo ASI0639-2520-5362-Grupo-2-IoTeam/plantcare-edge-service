@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, Float, Integer
+from sqlalchemy import Column, DateTime, Float, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 
@@ -12,6 +12,7 @@ class PlantModel(Base):
     __tablename__ = "plants"
 
     id = Column(Integer, primary_key=True)
+    device_id = Column(String(50), nullable=False, index=True)  # <-- AÑADIDO
     temperature = Column(Float)
     humidity = Column(Float)
     light = Column(Integer)

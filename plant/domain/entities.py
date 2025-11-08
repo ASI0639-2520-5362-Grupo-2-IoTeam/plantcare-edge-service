@@ -5,9 +5,10 @@ from datetime import datetime
 @dataclass
 class Plant:
     """
-    Represents a plant entity.
+    Represents a plant entity, including the device ID.
     """
     id: int
+    device_id: str  # <-- AÑADIDO
     temperature: float
     humidity: float
     light: int

@@ -31,6 +31,7 @@ class SQLAlchemyPlantRepository(PlantRepository):
     def save(self, plant: Plant) -> Plant:
         """Saves a plant entity to the database."""
         plant_model = PlantModel(
+            device_id=plant.device_id,  # <-- AÑADIDO
             temperature=plant.temperature,
             humidity=plant.humidity,
             light=plant.light,
@@ -41,6 +42,7 @@ class SQLAlchemyPlantRepository(PlantRepository):
         self.db_session.refresh(plant_model)
         return Plant(
             id=plant_model.id,
+            device_id=plant_model.device_id,  # <-- AÑADIDO
             temperature=plant_model.temperature,
             humidity=plant_model.humidity,
             light=plant_model.light,
@@ -55,6 +57,7 @@ class SQLAlchemyPlantRepository(PlantRepository):
         return [
             Plant(
                 id=plant_model.id,
+                device_id=plant_model.device_id,  # <-- AÑADIDO
                 temperature=plant_model.temperature,
                 humidity=plant_model.humidity,
                 light=plant_model.light,
