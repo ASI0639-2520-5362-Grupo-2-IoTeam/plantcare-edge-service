@@ -52,6 +52,8 @@ def add_plant_data():
     responses:
       200:
         description: Datos guardados localmente exitosamente.
+        schema:
+          $ref: '#/definitions/Plant'
       400:
         description: Error en la petición, JSON inválido o datos faltantes.
     definitions:
@@ -87,8 +89,6 @@ def add_plant_data():
       Plant:
         type: object
         properties:
-          id:
-            type: integer
           device_id:
             type: string
           temperature:
@@ -116,7 +116,4 @@ def add_plant_data():
         
     saved_plant_data = plant_application_service.add_plant_data(data)
 
-    return jsonify({
-        "message": "Datos guardados exitosamente.",
-        "saved_data": saved_plant_data
-    }), 200
+    return jsonify(saved_plant_data), 200
