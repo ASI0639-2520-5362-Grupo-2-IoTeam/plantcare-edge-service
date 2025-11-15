@@ -1,5 +1,12 @@
 from plant.domain.entities import Plant
 
+# Constants for dictionary keys to avoid magic strings
+KEY_DEVICE_ID = "device_id"
+KEY_TEMPERATURE = "air_temperature_celsius"
+KEY_HUMIDITY = "air_humidity_percent"
+KEY_LIGHT = "luminosity_lux"
+KEY_SOIL_HUMIDITY = "soil_moisture_percent"
+
 
 class PlantService:
     """
@@ -18,10 +25,10 @@ class PlantService:
         """
         return Plant(
             id=None,  # The ID will be assigned by the database
-            device_id=data["device_id"],  # <-- AÑADIDO
-            temperature=data["air_temperature_celsius"],
-            humidity=data["air_humidity_percent"],
-            light=data["luminosity_lux"],
-            soil_humidity=data["soil_moisture_percent"],
+            device_id=data[KEY_DEVICE_ID],
+            temperature=data[KEY_TEMPERATURE],
+            humidity=data[KEY_HUMIDITY],
+            light=data[KEY_LIGHT],
+            soil_humidity=data[KEY_SOIL_HUMIDITY],
             created_at=None  # The creation date will be assigned by the database
         )
