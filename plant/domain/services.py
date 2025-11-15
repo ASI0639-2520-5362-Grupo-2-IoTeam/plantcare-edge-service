@@ -19,9 +19,9 @@ class PlantService:
         return Plant(
             id=None,  # The ID will be assigned by the database
             device_id=data["device_id"],  # <-- AÑADIDO
-            temperature=data["temperature"],
-            humidity=data["humidity"],
-            light=data["light"],
-            soil_humidity=data["soil_humidity"],
+            temperature=data["air_temperature_celsius"],
+            humidity=data["air_humidity_percent"],
+            light=data["luminosity_lux"],
+            soil_humidity=data["soil_moisture_percent"],
             created_at=None  # The creation date will be assigned by the database
         )

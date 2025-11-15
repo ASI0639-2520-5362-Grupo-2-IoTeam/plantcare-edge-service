@@ -11,15 +11,15 @@ plant_blueprint = Blueprint("plant", __name__)
 @plant_blueprint.route("/plants", methods=["GET"])
 def get_all_plants():
     """
-    Obtiene todos los registros de datos de plantas.
-    Devuelve una lista de todos los datos de sensores guardados en la base de datos,
-    ordenados por fecha de creación descendente.
+    Retrieves all plant data records.
+    Returns a list of all sensor data stored in the database,
+    ordered by creation date in descending order.
     ---
     tags:
       - Plants
     responses:
       200:
-        description: Una lista de todos los registros de datos de plantas.
+        description: A list of all plant data records.
         schema:
           type: array
           items:
@@ -39,7 +39,7 @@ def get_all_plants():
 @plant_blueprint.route("/plants", methods=["POST"])
 def add_plant_data():
     """
-    Endpoint para añadir nuevos datos de una planta.
+    Endpoint to add new plant data.
     ---
     tags:
       - Plants
@@ -51,40 +51,40 @@ def add_plant_data():
           $ref: "#/definitions/PlantData"
     responses:
       200:
-        description: Datos guardados localmente exitosamente.
+        description: Data successfully saved locally.
         schema:
           $ref: '#/definitions/Plant'
       400:
-        description: Error en la petición, JSON inválido o datos faltantes.
+        description: Invalid JSON or missing required fields.
     definitions:
       PlantData:
         type: object
         required:
           - device_id
-          - temperature
-          - humidity
-          - light
-          - soil_humidity
+          - air_temperature_celsius
+          - air_humidity_percent
+          - luminosity_lux
+          - soil_moisture_percent
         properties:
           device_id:
             type: string
-            description: El ID único del dispositivo IoT.
+            description: The unique ID of the IoT device.
             example: "esp32-100100C40A24"
-          temperature:
+          air_temperature_celsius:
             type: number
-            description: La temperatura registrada.
+            description: The air temperature recorded in degrees Celsius.
             example: 25.5
-          humidity:
+          air_humidity_percent:
             type: number
-            description: La humedad ambiental registrada.
+            description: The air humidity recorded as a percentage.
             example: 60.2
-          light:
+          luminosity_lux:
             type: integer
-            description: El nivel de luz registrado.
+            description: The light level recorded in lux.
             example: 850
-          soil_humidity:
+          soil_moisture_percent:
             type: integer
-            description: La humedad del suelo registrada.
+            description: The soil moisture recorded as a percentage.
             example: 75
       Plant:
         type: object
@@ -104,8 +104,8 @@ def add_plant_data():
             format: date-time
     """
     data = request.get_json()
-    if not data or not all(k in data for k in ["device_id", "temperature", "humidity", "light", "soil_humidity"]):
-        return jsonify({"message": "JSON inválido o faltan campos requeridos."}), 400
+    if not data or not all(k in data for k in ["device_id", "air_temperature_celsius", "air_humidity_percent", "luminosity_lux", "soil_moisture_percent"]):
+        return jsonify({"message": "Invalid JSON or missing required fields."}), 400
 
     db_session = next(get_db_session())
     plant_repository = SQLAlchemyPlantRepository(db_session=db_session)
@@ -117,3 +117,76 @@ def add_plant_data():
     saved_plant_data = plant_application_service.add_plant_data(data)
 
     return jsonify(saved_plant_data), 200
+
+"""
+Swagger Documentation for Plant Endpoints
+
+This module defines the RESTful API endpoints for managing plant data. The endpoints are documented using Swagger to provide clear and detailed information about their functionality.
+
+Endpoints:
+
+1. GET /plants
+   - Description: Retrieves all plant data records stored in the database.
+   - Tags: Plants
+   - Responses:
+     - 200: A list of all plant data records.
+       - Schema: Array of Plant objects.
+
+2. POST /plants
+   - Description: Adds new plant data to the database.
+   - Tags: Plants
+   - Parameters:
+     - Body: JSON object containing the plant data.
+       - Required Fields:
+         - device_id: Unique identifier for the IoT device.
+         - air_temperature_celsius: Air temperature in Celsius.
+         - air_humidity_percent: Air humidity in percentage.
+         - luminosity_lux: Light level in lux.
+         - soil_moisture_percent: Soil moisture in percentage.
+   - Responses:
+     - 200: Successfully saved the plant data.
+       - Schema: Plant object.
+     - 400: Invalid JSON or missing required fields.
+
+Definitions:
+
+1. PlantData:
+   - Type: Object
+   - Required Fields:
+     - device_id: String
+     - air_temperature_celsius: Number
+     - air_humidity_percent: Number
+     - luminosity_lux: Integer
+     - soil_moisture_percent: Integer
+   - Example:
+     ```json
+     {
+       "device_id": "esp32-100100C40A24",
+       "air_temperature_celsius": 25.5,
+       "air_humidity_percent": 60.2,
+       "luminosity_lux": 850,
+       "soil_moisture_percent": 75
+     }
+     ```
+
+2. Plant:
+   - Type: Object
+   - Fields:
+     - device_id: String
+     - air_temperature_celsius: Number
+     - air_humidity_percent: Number
+     - luminosity_lux: Integer
+     - soil_moisture_percent: Integer
+     - created_at: String (ISO 8601 format)
+   - Example:
+     ```json
+     {
+       "device_id": "esp32-100100C40A24",
+       "air_temperature_celsius": 25.5,
+       "air_humidity_percent": 60.2,
+       "luminosity_lux": 850,
+       "soil_moisture_percent": 75,
+       "created_at": "2025-11-15T12:00:00Z"
+     }
+     ```
+"""
