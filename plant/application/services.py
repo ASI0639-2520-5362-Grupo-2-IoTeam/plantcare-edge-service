@@ -13,14 +13,14 @@ class PlantApplicationService:
 
     def _plant_to_dto(self, plant) -> Dict:
         """
-        Converts a Plant object to a dictionary (DTO).
+        Converts a Plant object to a dictionary (DTO) with original field names.
         """
         return {
             "device_id": plant.device_id,
-            "temperature": plant.temperature,
-            "humidity": plant.humidity,
-            "light": plant.light,
-            "soil_humidity": plant.soil_humidity,
+            "air_temperature_celsius": plant.temperature,
+            "air_humidity_percent": plant.humidity,
+            "luminosity_lux": plant.light,
+            "soil_moisture_percent": plant.soil_humidity,
             "created_at": plant.created_at
         }
 
